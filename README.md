@@ -35,7 +35,15 @@
 
 ## 安装
 
-### 方式一 · 从源码构建
+### 方式一 · 下载安装包（免编译）
+
+到 [Releases](https://github.com/cccgang/moyu-book-openidea/releases) 下载 `owncode.thief-book-<版本>.oiplugin`，
+OpenIDEA › Settings › Plugins › **Install Plugin from Package File…** 选中它即可。
+OpenIDEA 支持单文件安装包（`.oiplugin` / `.zip`），不必选整个文件夹。
+
+> 升级版本时先卸载旧插件并重启 IDE，再装新包，避免装到旧拷贝。
+
+### 方式二 · 从源码构建
 
 ```sh
 git clone https://github.com/cccgang/moyu-book-openidea.git
@@ -49,7 +57,11 @@ mkdir dist && cp target/wasm32-wasip2/release/thief_book_openidea.wasm dist/plug
 然后 OpenIDEA › Settings › Plugins › **Install Plugin from Disk…**，选择项目文件夹（含 `plugin.toml`）。
 构建完成后重装/升级插件时，记得先卸载旧版并重启 IDE 再装，避免装到旧拷贝。
 
-### 方式二 · 开发模式
+打自己的单文件安装包（可选）：把 `plugin.toml`、`dist/plugin.wasm`、`web/` 打成 zip——
+包内容放在压缩包根目录或唯一顶层文件夹都可以——扩展名用 `.oiplugin`。
+官方 CLI 的 `openidea-plugin pack` / `check` 能完成同样的打包与校验。
+
+### 方式三 · 开发模式
 
 把项目文件夹放进项目的 `.openidea/plugins/thief-book-openidea/`，执行 *Reload Plugins* 热加载。
 
