@@ -1,10 +1,10 @@
-id = "owncode.thief-book"
-name = "Thief Book"
-version = "0.2.3"
-description = "摸鱼看小说：底部阅读面板（每页 5 行、字号/行数/行距可调），快捷键翻页，老板键一键伪装成 TODO 清单，阅读进度持久化。支持 UTF-8/GB18030 编码的 txt。"
+id = "owncode.moyu-book"
+name = "Moyu Book"
+version = "0.3.0"
+description = "摸鱼看书：底部阅读面板（每页 5 段、字号/行数/行距可调），快捷键翻页，老板键一键伪装成 TODO 清单，阅读进度持久化。支持 UTF-8/GB18030 编码的 txt。"
 authors = ["chen.g"]
 license = "MIT"
-change-notes = "0.2.3 — 移除点击正文换页与滚轮换页：翻页只走快捷键 Alt+Y/L、工具条 ◂ ▸ 与键盘；滚轮仅在页内滚动。"
+change-notes = "0.3.0 — 插件更名 Moyu Book（原 Thief Book），插件 id 变为 owncode.moyu-book。新 id 与旧版数据不互通：安装后重新运行「书库路径」放书、进度从头记录。"
 categories = ["tools"]
 engines.openidea = "^1.5"
 wasm = "dist/plugin.wasm"
@@ -15,67 +15,67 @@ required = ["storage", "clipboard"]
 
 [[contributes.commands]]
 id = "prev-page"
-title = "Thief Book: 上一页"
+title = "Moyu Book: 上一页"
 
 [[contributes.commands]]
 id = "next-page"
-title = "Thief Book: 下一页"
+title = "Moyu Book: 下一页"
 
 [[contributes.commands]]
 id = "boss-key"
-title = "Thief Book: 老板键（隐藏/恢复）"
+title = "Moyu Book: 老板键（隐藏/恢复）"
 
 [[contributes.commands]]
 id = "next-chapter"
-title = "Thief Book: 下一章"
+title = "Moyu Book: 下一章"
 
 [[contributes.commands]]
 id = "prev-chapter"
-title = "Thief Book: 上一章"
+title = "Moyu Book: 上一章"
 
 [[contributes.commands]]
 id = "jump"
-title = "Thief Book: 跳页"
+title = "Moyu Book: 跳页"
 
 [[contributes.commands]]
 id = "chapters"
-title = "Thief Book: 章节目录"
+title = "Moyu Book: 章节目录"
 
 [[contributes.commands]]
 id = "switch-book"
-title = "Thief Book: 换书"
+title = "Moyu Book: 换书"
 
 [[contributes.commands]]
 id = "font-bigger"
-title = "Thief Book: 字号 +"
+title = "Moyu Book: 字号 +"
 
 [[contributes.commands]]
 id = "font-smaller"
-title = "Thief Book: 字号 −"
+title = "Moyu Book: 字号 −"
 
 [[contributes.commands]]
 id = "lines-more"
-title = "Thief Book: 每页行数 +"
+title = "Moyu Book: 每页行数 +"
 
 [[contributes.commands]]
 id = "lines-less"
-title = "Thief Book: 每页行数 −"
+title = "Moyu Book: 每页行数 −"
 
 [[contributes.commands]]
 id = "spacing-more"
-title = "Thief Book: 行距 +"
+title = "Moyu Book: 行距 +"
 
 [[contributes.commands]]
 id = "spacing-less"
-title = "Thief Book: 行距 −"
+title = "Moyu Book: 行距 −"
 
 [[contributes.commands]]
 id = "library-path"
-title = "Thief Book: 书库路径（往这里放 txt）"
+title = "Moyu Book: 书库路径（往这里放 txt）"
 
 [[contributes.commands]]
 id = "load-sample"
-title = "Thief Book: 载入示例小说"
+title = "Moyu Book: 载入示例小说"
 
 [[contributes.keymaps]]
 command = "prev-page"
@@ -91,11 +91,11 @@ key = "Alt+I"
 
 [[contributes.views]]
 id = "reader"
-title = "Thief Book"
+title = "Moyu Book"
 location = "bottom"
 web = "web/index.html"
 
 [[contributes.statusBar]]
-id = "thief-book"
+id = "moyu-book"
 text = "📖"
 command = "jump"

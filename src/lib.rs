@@ -1,4 +1,4 @@
-//! Thief Book for OpenIDEA —— 摸鱼看小说插件。
+//! Moyu Book for OpenIDEA（摸鱼看书）—— 摸鱼看小说插件。
 //!
 //! 底部工具窗口（web 视图 web/index.html）显示当前页；状态栏项显示书名与进度；
 //! 全部状态落 storage，实例被 idle 回收或 IDE 重启都无损。
@@ -21,7 +21,7 @@ use openidea_plugin::{host, register_plugin, Error, Invocation, NotificationLeve
 use openidea_plugin::views::{View, ViewEvent, Views};
 
 const VIEW: &str = "reader";
-const ITEM: &str = "thief-book";
+const ITEM: &str = "moyu-book";
 const K_BOOK: &str = "book";
 const K_HIDDEN: &str = "hidden";
 const K_SETTINGS: &str = "settings";
@@ -102,7 +102,7 @@ fn book_path(book: &str) -> Result<String, Error> {
 }
 
 /// 读取 + 解码 + 解析（显示行 = 段落）。
-fn open_book(book: &str, s: &view::Settings) -> Result<(Novel, Vec<Line>), String> {
+fn open_book(book: &str, _s: &view::Settings) -> Result<(Novel, Vec<Line>), String> {
     let path = book_path(book).map_err(|e| format!("拿不到书库路径：{e:?}"))?;
     let bytes = host::fs::read_bytes(&path).map_err(|e| format!("读不了《{book}》：{e:?}"))?;
     let (text, _enc) = novel::decode(&bytes)?;
@@ -155,9 +155,9 @@ enum Act {
 }
 
 #[derive(Default)]
-struct ThiefBook;
+struct MoyuBook;
 
-impl ThiefBook {
+impl MoyuBook {
     /// 状态栏项：书名 + 进度。不读全书（用缓存的 pct）。
     fn status_item(&self) -> Option<StatusItem> {
         let book = current_book()?;
@@ -165,7 +165,7 @@ impl ThiefBook {
         let pct = storage_get(&pct_key(&book)).and_then(|v| v.parse::<u32>().ok()).unwrap_or(0);
         Some(StatusItem {
             text: format!("📖 {stem} {pct}%"),
-            tooltip: Some("Thief Book 阅读进度 · 点击跳页".into()),
+            tooltip: Some("Moyu Book 阅读进度 · 点击跳页".into()),
             command: Some("jump".into()),
         })
     }
@@ -198,7 +198,7 @@ impl ThiefBook {
         let Some(book) = current_book() else {
             let dir = plugin_dir().unwrap_or_default();
             return msg_json(&format!(
-                "书库是空的：把 txt 小说放进书库文件夹（下方路径），或运行命令“Thief Book: 载入示例小说”。\n{dir}"
+                "书库是空的：把 txt 小说放进书库文件夹（下方路径），或运行命令“Moyu Book: 载入示例小说”。\n{dir}"
             ));
         };
         let pos = load_pos(&book);
@@ -241,7 +241,7 @@ impl ThiefBook {
             Act::LibPath => {
                 let dir = plugin_dir()?;
                 let _ = host::copy_to_clipboard(&dir);
-                host::notify(NotificationLevel::Info, "Thief Book 书库", &format!("把 txt 小说放进：\n{dir}\n\n路径已复制到剪贴板。"));
+                host::notify(NotificationLevel::Info, "Moyu Book 书库", &format!("把 txt 小说放进：\n{dir}\n\n路径已复制到剪贴板。"));
                 Ok(None)
             }
             Act::Sample => {
@@ -292,7 +292,7 @@ impl ThiefBook {
         save_settings(&s);
         host::notify(
             NotificationLevel::Info,
-            "Thief Book",
+            "Moyu Book",
             &format!("字号 {} · 每页 {} 行 · 行距 {}em（行宽自适应）", s.font, s.lines, s.spacing_em()),
         );
         self.sync_ui();
@@ -302,7 +302,7 @@ impl ThiefBook {
     fn switch_book(&mut self) -> Result<Option<String>, Error> {
         let books = library()?;
         if books.is_empty() {
-            host::notify(NotificationLevel::Warning, "Thief Book", "书库是空的：运行“Thief Book: 书库路径”把 txt 放进去。");
+            host::notify(NotificationLevel::Warning, "Moyu Book", "书库是空的：运行“Moyu Book: 书库路径”把 txt 放进去。");
             self.push_state();
             return Ok(None);
         }
@@ -322,14 +322,14 @@ impl ThiefBook {
     fn book_ctx(&self) -> Result<(Novel, Vec<Line>), Error> {
         let Some(book) = current_book() else {
             self.push_state();
-            return Err("Thief Book：书库是空的，先运行“Thief Book: 书库路径”放书，或“载入示例小说”。".into());
+            return Err("Moyu Book：书库是空的，先运行“Moyu Book: 书库路径”放书，或“载入示例小说”。".into());
         };
         let s = load_settings();
         match open_book(&book, &s) {
             Ok(pair) => Ok(pair),
             Err(msg) => {
                 storage_set(K_BOOK, "");
-                host::notify(NotificationLevel::Error, "Thief Book", &msg);
+                host::notify(NotificationLevel::Error, "Moyu Book", &msg);
                 self.push_state();
                 Err(msg.into())
             }
@@ -363,7 +363,7 @@ impl ThiefBook {
             Dir::Prev => n.prev_chapter(pos),
         };
         let Some(ch) = ch else {
-            host::notify(NotificationLevel::Info, "Thief Book", if dir == Dir::Next { "已经是最后一章" } else { "已经是第一章" });
+            host::notify(NotificationLevel::Info, "Moyu Book", if dir == Dir::Next { "已经是最后一章" } else { "已经是第一章" });
             return Ok(None);
         };
         save_progress(&book, ch.start, n.percent(ch.start));
@@ -385,7 +385,7 @@ impl ThiefBook {
             return Ok(None);
         };
         let Ok(p) = v.trim().parse::<usize>() else {
-            host::notify(NotificationLevel::Warning, "Thief Book", &format!("“{v}”不是页码"));
+            host::notify(NotificationLevel::Warning, "Moyu Book", &format!("“{v}”不是页码"));
             return Ok(None);
         };
         let page = p.clamp(1, total);
@@ -402,7 +402,7 @@ impl ThiefBook {
         let (n, _lines) = self.book_ctx()?;
         let book = current_book().ok_or("没有当前书")?;
         if n.chapters.is_empty() {
-            host::notify(NotificationLevel::Info, "Thief Book", "这本书没有识别到章节标题（第X章/卷/节/回）。");
+            host::notify(NotificationLevel::Info, "Moyu Book", "这本书没有识别到章节标题（第X章/卷/节/回）。");
             return Ok(None);
         }
         let items: Vec<PickItem> = n
@@ -425,7 +425,7 @@ enum Dir {
     Prev,
 }
 
-impl Plugin for ThiefBook {
+impl Plugin for MoyuBook {
     fn run_command(&mut self, id: &str, ctx: &Invocation, _arg: Option<&str>) -> Result<Option<String>, Error> {
         let act = match id {
             "prev-page" => Act::Prev,
@@ -444,13 +444,13 @@ impl Plugin for ThiefBook {
             "spacing-less" => Act::Spacing(-1),
             "library-path" => Act::LibPath,
             "load-sample" => Act::Sample,
-            other => return Err(format!("Thief Book：未知命令 {other}").into()),
+            other => return Err(format!("Moyu Book：未知命令 {other}").into()),
         };
         self.run(act, ctx)
     }
 }
 
-impl Views for ThiefBook {
+impl Views for MoyuBook {
     /// web 视图的内容由页面（web/index.html）渲染，状态经 push_state 推送；
     /// render 仅在 IDE 需要占位时被调用。
     fn render(
@@ -487,7 +487,7 @@ impl Views for ThiefBook {
     }
 }
 
-register_plugin!(ThiefBook, views);
+register_plugin!(MoyuBook, views);
 
 /// 示例小说（占位文本，仅为演示排版/翻章/进度）。
 const SAMPLE: &str = r#"第一章 客栈夜雨
@@ -546,11 +546,11 @@ mod tests {
 
         // 换书：pick 返回书名 key
         mock.answer_next_prompt(Some(&["书甲.txt"]));
-        ThiefBook.run_command("switch-book", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("switch-book", &mock.invocation(), None).unwrap();
         assert_eq!(storage_get(K_BOOK).as_deref(), Some("书甲.txt"));
 
         // 下一页：书只有一页，页码 clamp 不越界，pos = 行0 起点
-        ThiefBook.run_command("next-page", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("next-page", &mock.invocation(), None).unwrap();
         let (n, lines) = {
             let s = load_settings();
             open_book("书甲.txt", &s).unwrap()
@@ -560,9 +560,9 @@ mod tests {
         assert_eq!(n.chapters.len(), 2);
 
         // 跳章
-        ThiefBook.run_command("next-chapter", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("next-chapter", &mock.invocation(), None).unwrap();
         assert_eq!(load_pos("书甲.txt"), n.chapters[1].start);
-        ThiefBook.run_command("prev-chapter", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("prev-chapter", &mock.invocation(), None).unwrap();
         assert_eq!(load_pos("书甲.txt"), n.chapters[0].start);
     }
 
@@ -571,11 +571,11 @@ mod tests {
         let mock = MockHost::install().with_capabilities(&["storage"]);
         setup(&mock, "书乙.txt", "第一章 起\n内容。");
         mock.answer_next_prompt(Some(&["书乙.txt"]));
-        ThiefBook.run_command("switch-book", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("switch-book", &mock.invocation(), None).unwrap();
         let n0 = mock.view_messages().len();
 
         // 老板键 → hidden，且向页面推 boss:true
-        ThiefBook.run_command("boss-key", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("boss-key", &mock.invocation(), None).unwrap();
         assert!(hidden());
         assert!(mock.status_items().get(ITEM).is_none(), "老板模式状态栏应无小说项");
         let pushed = mock.view_messages();
@@ -584,11 +584,11 @@ mod tests {
 
         // 隐藏期间翻页被忽略
         let before = load_pos("书乙.txt");
-        ThiefBook.run_command("next-page", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("next-page", &mock.invocation(), None).unwrap();
         assert_eq!(load_pos("书乙.txt"), before);
 
         // 再按恢复：boss:false 且状态栏项回来
-        ThiefBook.run_command("boss-key", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("boss-key", &mock.invocation(), None).unwrap();
         assert!(!hidden());
         assert!(mock.status_items().contains_key(ITEM));
         let pushed = mock.view_messages();
@@ -607,41 +607,41 @@ mod tests {
         }
         setup(&mock, "书丁.txt", &body);
         mock.answer_next_prompt(Some(&["书丁.txt"]));
-        ThiefBook.run_command("switch-book", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("switch-book", &mock.invocation(), None).unwrap();
         mock.view_messages().clear();
 
         // hello → 推送当前页
-        ThiefBook.handle("reader", ViewEvent::Message("hello".into()), &mock.invocation()).unwrap();
+        MoyuBook.handle("reader", ViewEvent::Message("hello".into()), &mock.invocation()).unwrap();
         let pushed = mock.view_messages();
         assert!(pushed.last().unwrap().1.contains("\"t\":\"page\""), "hello 应收到页面状态：{pushed:?}");
 
         // next 消息推进页首并推送新状态
         let before = load_pos("书丁.txt");
-        ThiefBook.handle("reader", ViewEvent::Message("next".into()), &mock.invocation()).unwrap();
+        MoyuBook.handle("reader", ViewEvent::Message("next".into()), &mock.invocation()).unwrap();
         assert!(load_pos("书丁.txt") > before, "next 消息应推进页首");
         assert!(mock.view_messages().len() > pushed.len(), "翻页后应再次推送");
 
         // prev 退回；boss 进入老板模式；未知消息忽略
-        ThiefBook.handle("reader", ViewEvent::Message("prev".into()), &mock.invocation()).unwrap();
+        MoyuBook.handle("reader", ViewEvent::Message("prev".into()), &mock.invocation()).unwrap();
         assert_eq!(load_pos("书丁.txt"), before);
-        ThiefBook.handle("reader", ViewEvent::Message("boss".into()), &mock.invocation()).unwrap();
+        MoyuBook.handle("reader", ViewEvent::Message("boss".into()), &mock.invocation()).unwrap();
         assert!(hidden());
-        ThiefBook.handle("reader", ViewEvent::Message("whatever".into()), &mock.invocation()).unwrap();
+        MoyuBook.handle("reader", ViewEvent::Message("whatever".into()), &mock.invocation()).unwrap();
         assert!(hidden());
     }
 
     #[test]
     fn settings_commands_adjust_and_persist() {
         let mock = MockHost::install().with_capabilities(&["storage"]);
-        ThiefBook.run_command("font-bigger", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("font-bigger", &mock.invocation(), None).unwrap();
         assert_eq!(load_settings().font, 15);
-        ThiefBook.run_command("lines-more", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("lines-more", &mock.invocation(), None).unwrap();
         assert_eq!(load_settings().lines, 6);
-        ThiefBook.run_command("spacing-more", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("spacing-more", &mock.invocation(), None).unwrap();
         assert_eq!(load_settings().spacing_x10, 16);
         // 边界：行数减到底
         for _ in 0..20 {
-            ThiefBook.run_command("lines-less", &mock.invocation(), None).unwrap();
+            MoyuBook.run_command("lines-less", &mock.invocation(), None).unwrap();
         }
         assert_eq!(load_settings().lines, 1);
     }
@@ -653,7 +653,7 @@ mod tests {
         setup(&mock, "书丙.txt", &format!("{}\n", "好".repeat(20)).repeat(10));
         storage_set(K_SETTINGS, &view::Settings { font: 14, lines: 2, spacing_x10: 15 }.encode());
         mock.answer_next_prompt(Some(&["书丙.txt"]));
-        ThiefBook.run_command("switch-book", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("switch-book", &mock.invocation(), None).unwrap();
 
         let s = load_settings();
         let per = s.lines as usize;
@@ -663,19 +663,19 @@ mod tests {
 
         // 跳到第 3 页
         mock.answer_next_prompt(Some(&["3"]));
-        ThiefBook.run_command("jump", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("jump", &mock.invocation(), None).unwrap();
         assert_eq!(load_pos("书丙.txt"), lines[(3 - 1) * per].start);
 
         // 越界页码 clamp 到最后一页
         mock.answer_next_prompt(Some(&["99"]));
-        ThiefBook.run_command("jump", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("jump", &mock.invocation(), None).unwrap();
         assert_eq!(load_pos("书丙.txt"), lines[(total - 1) * per].start);
     }
 
     #[test]
     fn library_path_notifies_and_copies() {
         let mock = MockHost::install().with_capabilities(&["storage", "clipboard"]);
-        ThiefBook.run_command("library-path", &mock.invocation(), None).unwrap();
+        MoyuBook.run_command("library-path", &mock.invocation(), None).unwrap();
         assert_eq!(mock.notifications().len(), 1);
         assert!(mock.clipboard().is_some());
     }

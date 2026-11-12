@@ -1,4 +1,4 @@
-# Thief Book for OpenIDEA 📖
+# Moyu Book for OpenIDEA 📖（摸鱼看书）
 
 > 一个 [OpenIDEA](https://github.com/l0ng-ai/openidea) 摸鱼插件：在 IDE 底部的工具窗口里读 txt 小说，全局快捷键翻页，老板键一键隐身。
 > A stealth txt-novel reader for OpenIDEA — read in a bottom tool window, flip pages with hotkeys, vanish with a boss key.
@@ -37,7 +37,7 @@
 
 ### 方式一 · 下载安装包（免编译）
 
-到 [Releases](https://github.com/cccgang/moyu-book-openidea/releases) 下载 `owncode.thief-book-<版本>.oiplugin`，
+到 [Releases](https://github.com/cccgang/moyu-book-openidea/releases) 下载 `owncode.moyu-book-<版本>.oiplugin`，
 OpenIDEA › Settings › Plugins › **Install Plugin from Package File…** 选中它即可。
 OpenIDEA 支持单文件安装包（`.oiplugin` / `.zip`），不必选整个文件夹。
 
@@ -51,7 +51,7 @@ cd moyu-book-openidea
 rustup target add wasm32-wasip2
 cargo test                                        # 主机单测（可选）
 cargo build --release --target wasm32-wasip2
-mkdir dist && cp target/wasm32-wasip2/release/thief_book_openidea.wasm dist/plugin.wasm
+mkdir dist && cp target/wasm32-wasip2/release/moyu_book_openidea.wasm dist/plugin.wasm
 ```
 
 然后 OpenIDEA › Settings › Plugins › **Install Plugin from Disk…**，选择项目文件夹（含 `plugin.toml`）。
@@ -69,7 +69,7 @@ mkdir dist && cp target/wasm32-wasip2/release/thief_book_openidea.wasm dist/plug
 
 ## 快速上手
 
-1. 装好后运行命令 **`Thief Book: 载入示例小说`** 直接体验；或运行 **`Thief Book: 书库路径`** 拿到书库地址（自动复制到剪贴板），把你的 txt 小说丢进去。
+1. 装好后运行命令 **`Moyu Book: 载入示例小说`** 直接体验；或运行 **`Moyu Book: 书库路径`** 拿到书库地址（自动复制到剪贴板），把你的 txt 小说丢进去。
 2. `Alt+L` / `Alt+Y` 翻页；状态栏 📖 显示书名与进度，点击可跳页。
 3. 老板来了按 `Alt+I`，走了再按一次。
 
@@ -91,7 +91,7 @@ mkdir dist && cp target/wasm32-wasip2/release/thief_book_openidea.wasm dist/plug
 
 ## 全部命令
 
-Search Everywhere › Actions 搜 "Thief Book" 即可看到：
+Search Everywhere › Actions 搜 "Moyu Book" 即可看到：
 
 | 分类 | 命令 |
 |---|---|
