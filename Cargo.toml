@@ -1,0 +1,23 @@
+[package]
+name = "thief-book-openidea"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+# 插件独立于 IDE 工作区构建（target wasm32-wasip2）。
+[workspace]
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# SDK 用已发布应用 v0.1.42 同款 tag（该 tag 的插件 API 为 1.5，与 manifest engines "^1.5" 匹配）。
+openidea-plugin = { git = "https://github.com/l0ng-ai/openidea", tag = "v0.1.42" }
+encoding_rs = "0.8"
+
+[profile.release]
+opt-level = "s"
+lto = true
+strip = true
+codegen-units = 1
+panic = "abort"

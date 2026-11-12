@@ -1,0 +1,120 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; height: 100%; }
+  body {
+    display: flex; flex-direction: column;
+    padding: 6px 14px;
+    background: var(--openidea-bg, #ffffff); color: var(--openidea-fg, #333333);
+    font-family: var(--openidea-font-ui, system-ui, sans-serif);
+    overflow: hidden; user-select: none; cursor: default;
+  }
+  #bar { display: flex; gap: 4px; align-items: center; padding-bottom: 4px; }
+  #bar button {
+    background: none; border: none; color: var(--openidea-fg-muted, #888888);
+    font: inherit; cursor: pointer; padding: 1px 8px; border-radius: 4px;
+  }
+  #bar button:hover { background: var(--openidea-bg-hover, rgba(0,0,0,.06)); }
+  #page { flex: 1; overflow-y: auto; overflow-x: hidden; }
+  #page .l { white-space: pre-wrap; word-break: break-all; }
+  #page .pl { margin-bottom: 0.45em; }
+  #status { color: var(--openidea-fg-muted, #888888); font-size: 12px; padding-top: 4px; text-align: right; }
+  #center { flex: 1; display: flex; align-items: center; }
+  #center[hidden] { display: none; }
+  #msg { font-size: 13px; line-height: 1.7em; color: var(--openidea-fg-muted, #888888); white-space: pre-wrap; }
+  .todo { font-size: 13px; line-height: 1.6em; color: var(--openidea-fg-muted, #888888); }
+  .todo h4 { margin: 0 0 8px; font-size: 13px; }
+</style>
+</head>
+<body>
+  <div id="bar">
+    <button data-a="prev" title="上一页">◂</button>
+    <button data-a="next" title="下一页">▸</button>
+    <button data-a="chapters" title="章节目录">章</button>
+    <button data-a="switch" title="换书">换</button>
+    <button data-a="boss" id="bossBtn" title="老板键">隐</button>
+  </div>
+  <div id="page"></div>
+  <div id="center" hidden><div id="msg"></div></div>
+  <div id="status"></div>
+<script>
+(function () {
+  var TODO = [
+    "修复分页接口在空列表下的空指针",
+    "跟进测试环境的构建告警（Maven 依赖冲突）",
+    "复盘上周代码评审的遗留意见",
+    "把用户反馈的登录超时问题转给后端",
+    "更新 README 的部署说明",
+    "清理本地分支，合并已上线的 hotfix"
+  ];
+  var st = null;
+
+  function post(a) { try { openidea.postMessage(a); } catch (e) {} }
+  function el(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;"); }
+
+  function render() {
+    if (!st) return;
+    el("bossBtn").textContent = st.boss ? "显" : "隐";
+    if (st.t === "msg") {
+      el("page").hidden = true;
+      el("center").hidden = false;
+      el("msg").textContent = st.text;
+      el("status").textContent = "";
+      return;
+    }
+    el("center").hidden = true;
+    if (st.boss) {
+      var rows = '<div class="todo"><h4>本周待办</h4>';
+      for (var i = 0; i < TODO.length; i++) rows += "<div>☐ " + esc(TODO[i]) + "</div>";
+      el("page").hidden = false;
+      el("page").innerHTML = rows + "</div>";
+      el("page").style.fontSize = "13px";
+      el("page").style.lineHeight = "1.6em";
+      el("status").textContent = "";
+      return;
+    }
+    var html = "";
+    for (var i = 0; i < st.lines.length; i++) {
+      html += '<div class="l' + (st.lines[i][1] ? " pl" : "") + '">' + esc(st.lines[i][0]) + "</div>";
+    }
+    el("page").hidden = false;
+    el("page").innerHTML = html;
+    el("page").style.fontSize = st.font + "px";
+    el("page").style.lineHeight = st.spacing + "em";
+    el("page").scrollTop = 0;
+    el("status").textContent = st.status || "";
+  }
+
+  openidea.onMessage(function (text) {
+    try { st = JSON.parse(text); render(); } catch (e) {}
+  });
+
+  // 工具条按钮各司其职；点正文/滚轮不换页（滚轮只做页内滚动）
+  document.addEventListener("click", function (e) {
+    var b = e.target && e.target.closest ? e.target.closest("[data-a]") : null;
+    if (b) post(b.getAttribute("data-a"));
+  });
+  // 右键菜单也压掉，防误显
+  document.addEventListener("contextmenu", function (e) { e.preventDefault(); });
+  // 键盘：Alt+Y/L/I；PgUp/PgDn/方向键/空格/回车
+  document.addEventListener("keydown", function (e) {
+    var k = (e.key || "").toLowerCase();
+    var a = null;
+    if (e.altKey && !e.ctrlKey && !e.shiftKey) {
+      a = k === "y" ? "prev" : k === "l" ? "next" : k === "i" ? "boss" : null;
+    } else if (!e.ctrlKey && !e.metaKey && !e.altKey) {
+      if (k === "shift" || k === "control" || k === "alt" || k === "meta") return;
+      a = (k === "pagedown" || k === "arrowright" || k === " " || k === "enter") ? "next"
+        : (k === "pageup" || k === "arrowleft") ? "prev" : null;
+    }
+    if (a) { e.preventDefault(); post(a); }
+  });
+
+  post("hello");
+})();
+</script>
+</body>
+</html>

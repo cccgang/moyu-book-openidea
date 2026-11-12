@@ -1,0 +1,101 @@
+id = "owncode.thief-book"
+name = "Thief Book"
+version = "0.2.3"
+description = "摸鱼看小说：底部阅读面板（每页 5 行、字号/行数/行距可调），快捷键翻页，老板键一键伪装成 TODO 清单，阅读进度持久化。支持 UTF-8/GB18030 编码的 txt。"
+authors = ["chen.g"]
+license = "MIT"
+change-notes = "0.2.3 — 移除点击正文换页与滚轮换页：翻页只走快捷键 Alt+Y/L、工具条 ◂ ▸ 与键盘；滚轮仅在页内滚动。"
+categories = ["tools"]
+engines.openidea = "^1.5"
+wasm = "dist/plugin.wasm"
+activation = ["on-view:reader"]
+
+[capabilities]
+required = ["storage", "clipboard"]
+
+[[contributes.commands]]
+id = "prev-page"
+title = "Thief Book: 上一页"
+
+[[contributes.commands]]
+id = "next-page"
+title = "Thief Book: 下一页"
+
+[[contributes.commands]]
+id = "boss-key"
+title = "Thief Book: 老板键（隐藏/恢复）"
+
+[[contributes.commands]]
+id = "next-chapter"
+title = "Thief Book: 下一章"
+
+[[contributes.commands]]
+id = "prev-chapter"
+title = "Thief Book: 上一章"
+
+[[contributes.commands]]
+id = "jump"
+title = "Thief Book: 跳页"
+
+[[contributes.commands]]
+id = "chapters"
+title = "Thief Book: 章节目录"
+
+[[contributes.commands]]
+id = "switch-book"
+title = "Thief Book: 换书"
+
+[[contributes.commands]]
+id = "font-bigger"
+title = "Thief Book: 字号 +"
+
+[[contributes.commands]]
+id = "font-smaller"
+title = "Thief Book: 字号 −"
+
+[[contributes.commands]]
+id = "lines-more"
+title = "Thief Book: 每页行数 +"
+
+[[contributes.commands]]
+id = "lines-less"
+title = "Thief Book: 每页行数 −"
+
+[[contributes.commands]]
+id = "spacing-more"
+title = "Thief Book: 行距 +"
+
+[[contributes.commands]]
+id = "spacing-less"
+title = "Thief Book: 行距 −"
+
+[[contributes.commands]]
+id = "library-path"
+title = "Thief Book: 书库路径（往这里放 txt）"
+
+[[contributes.commands]]
+id = "load-sample"
+title = "Thief Book: 载入示例小说"
+
+[[contributes.keymaps]]
+command = "prev-page"
+key = "Alt+Y"
+
+[[contributes.keymaps]]
+command = "next-page"
+key = "Alt+L"
+
+[[contributes.keymaps]]
+command = "boss-key"
+key = "Alt+I"
+
+[[contributes.views]]
+id = "reader"
+title = "Thief Book"
+location = "bottom"
+web = "web/index.html"
+
+[[contributes.statusBar]]
+id = "thief-book"
+text = "📖"
+command = "jump"
